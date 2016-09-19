@@ -35,6 +35,12 @@ impl Meter {
                  (ppro.user_time + ppro.system_time +
                   ppro.child_user_time + ppro.child_system_time)) as f32 /
                 centisecs,
+            memory_rss: last.memory_rss,
+            memory_virtual: last.memory_virtual,
+            memory_swap: last.memory_swap,
+            memory_rss_peak: self.memory_rss_peak,
+            memory_virtual_peak: last.memory_virtual_peak,
+            memory_swap_peak: self.memory_swap_peak,
         })
     }
 }

@@ -44,6 +44,29 @@ quick_error! {
     }
 }
 
+quick_error! {
+    #[derive(Debug)]
+    /// Error reading or parsing /proc/self/status
+    pub enum StatusError {
+        Io(err: io::Error) {
+            description("IO error")
+            display("{}", err)
+            from()
+        }
+        ParseInt(e: ParseIntError) {
+            description("error parsing int")
+            display("error parsing int: {}", e)
+            from()
+        }
+        BadUnit {
+            description("bad unit in memory data")
+        }
+        BadFormat {
+            description("bad format")
+        }
+    }
+}
+
 
 quick_error! {
     #[derive(Debug)]
@@ -57,6 +80,11 @@ quick_error! {
         Uptime(err: UptimeError) {
             description("Error reading /proc/uptime")
             display("Error reading /proc/uptime: {}", err)
+            from()
+        }
+        Status(err: StatusError) {
+            description("Error reading /proc/self/status")
+            display("Error reading /proc/self/status: {}", err)
             from()
         }
         Stat(err: StatError) {

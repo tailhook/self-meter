@@ -23,6 +23,11 @@ impl Meter {
             num_snapshots: 10,
             snapshots: VecDeque::with_capacity(10),
             thread_names: HashMap::new(),
+            text_buf: String::with_capacity(1024),
+            path_buf: String::with_capacity(100),
+
+            memory_swap_peak: 0,
+            memory_rss_peak: 0,
         })
     }
 }

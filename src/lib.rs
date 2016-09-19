@@ -63,6 +63,18 @@ pub struct Report {
     pub process_cpu_usage: f32,
     /// Process' CPU usage with its awaited children. 100% is a single core
     pub gross_cpu_usage: f32,
+    /// Process' memory usage
+    pub memory_rss: u64,
+    /// Process' virtual memory usage
+    pub memory_virtual: u64,
+    /// Process' swap usage
+    pub memory_swap: u64,
+    /// Process' peak memory usage (not precise)
+    pub memory_rss_peak: u64,
+    /// Process' peak virtual memory usage (tracked by OS)
+    pub memory_virtual_peak: u64,
+    /// Process' swap usage (not precise)
+    pub memory_swap_peak: u64,
 }
 
 /// The main structure that makes mesurements and reports values
@@ -91,4 +103,13 @@ pub struct Meter {
     num_snapshots: usize,
     snapshots: VecDeque<Snapshot>,
     thread_names: HashMap<Pid, String>,
+    /// This is a buffer for reading some text data from /proc/anything.
+    /// We use it to avoid memory allocations. This makes code a little bit
+    /// more complex, but we want to avoid overhead as much as possible
+    text_buf: String,
+    /// This is a smaller buffer for formatting paths, similar to `text_buf`
+    path_buf: String,
+
+    memory_rss_peak: u64,
+    memory_swap_peak: u64,
 }
