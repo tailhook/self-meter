@@ -56,8 +56,6 @@ fn read_stat(path: &str, thread_info: &mut ThreadInfo, buf: &mut String)
         try!(iter.next().ok_or(StatError::BadFormat)).parse());
     thread_info.child_system_time = try!(
         try!(iter.next().ok_or(StatError::BadFormat)).parse());
-    println!("Child {} / {}", thread_info.child_user_time,
-        thread_info.child_system_time);
     Ok(())
 }
 
