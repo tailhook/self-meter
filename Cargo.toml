@@ -1,0 +1,21 @@
+[package]
+name = "self-meter"
+description = """
+    A tiny library to measure resource usage of the process it's used in.
+"""
+license = "MIT/Apache-2.0"
+readme = "README.rst"
+keywords = ["linux", "monitoring", "meter"]
+homepage = "http://github.com/tailhook/self-meter"
+documentation = "http://tailhook.github.io/self-meter/"
+version = "0.1.0"
+authors = ["paul@colomiets.name"]
+
+[dependencies]
+rustc-serialize = "0.3.19"
+quick-error = "1.1.0"
+
+[lib]
+name = "self_meter"
+path = "src/lib.rs"
+
