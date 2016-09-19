@@ -1,4 +1,4 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, UNIX_EPOCH};
 
 use {Meter, Report};
 
@@ -19,13 +19,17 @@ impl Meter {
         let lpro = &last.process;
         let ppro = &prev.process;
         let centisecs = (last.uptime - prev.uptime) as f32;
+        let mut cpu_usage = 100.0 * (1.0 -
+                (last.idle_time - prev.idle_time) as f32 /
+                (centisecs * self.num_cpus as f32));
+        if cpu_usage < 0. {  // sometimes we get inaccuracy
+            cpu_usage = 0.;
+        }
         Some(Report {
             timestamp_ms: duration_to_ms(
                 last.timestamp.duration_since(UNIX_EPOCH).unwrap()),
             duration_ms: duration_to_ms(last.instant - prev.instant),
-            global_cpu_usage: 100.0 * (1.0 -
-                (last.idle_time - prev.idle_time) as f32 /
-                (centisecs * self.num_cpus as f32)),
+            global_cpu_usage: cpu_usage,
             process_cpu_usage: 100.0 *
                 (lpro.user_time + lpro.system_time -
                  (ppro.user_time + ppro.system_time)) as f32 / centisecs,
