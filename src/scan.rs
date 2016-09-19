@@ -22,11 +22,11 @@ impl Meter {
 
         // First scan everything that relates to cpu_time to have as accurate
         // CPU usage measurements as possible
-        self.read_cpu_times(&mut snap.process,
+        try!(self.read_cpu_times(&mut snap.process,
             &mut snap.threads,
-            &mut snap.uptime, &mut snap.idle_time);
+            &mut snap.uptime, &mut snap.idle_time));
 
-        self.read_memory(&mut snap);
+        try!(self.read_memory(&mut snap));
 
         if snap.memory_rss > self.memory_rss_peak {
             self.memory_rss_peak = snap.memory_rss;
@@ -59,7 +59,7 @@ impl Meter {
         }
         try!(read_stat(&mut self.text_buf, "/proc/self/stat", process)
             .map_err(Error::Stat));
-        for (&tid, value) in &self.thread_names {
+        for (&tid, _) in &self.thread_names {
             self.path_buf.truncate(0);
             write!(&mut self.path_buf, "/proc/self/{}/stat", tid).unwrap();
             try!(read_stat(&mut self.text_buf, &self.path_buf[..],

@@ -1,7 +1,7 @@
 #[macro_use] extern crate quick_error;
 extern crate rustc_serialize;
 
-use std::time::{SystemTime, Instant};
+use std::time::{SystemTime, Instant, Duration};
 use std::collections::{VecDeque, HashMap};
 
 mod meter;
@@ -99,6 +99,7 @@ pub struct Report {
 /// without names, and we can fine-tune performance in the case we have known
 /// number of threads. Obviously, process-wide info accounts all the threads.
 pub struct Meter {
+    scan_interval: Duration,
     num_cpus: u32,
     num_snapshots: usize,
     snapshots: VecDeque<Snapshot>,

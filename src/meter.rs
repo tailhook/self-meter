@@ -19,6 +19,7 @@ impl Meter {
     /// of processes on the system. If that fails, we return error.
     pub fn new(scan_interval: Duration) -> Result<Meter, Error> {
         Ok(Meter {
+            scan_interval: scan_interval,
             num_cpus: try!(num_cpus().map_err(Error::Cpu)),
             num_snapshots: 10,
             snapshots: VecDeque::with_capacity(10),
