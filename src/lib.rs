@@ -1,5 +1,6 @@
 #[macro_use] extern crate quick_error;
 extern crate rustc_serialize;
+extern crate libc;
 
 use std::time::{SystemTime, Instant, Duration};
 use std::collections::{VecDeque, HashMap};

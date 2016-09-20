@@ -3,6 +3,8 @@ use std::fs;
 use std::time::Duration;
 use std::collections::{VecDeque, HashMap};
 
+use libc::{syscall, SYS_gettid};
+
 use {Meter, Error, Pid};
 
 
@@ -44,6 +46,12 @@ impl Meter {
         for s in &mut self.snapshots {
             s.threads.remove(&tid);
         }
+    }
+    /// Add current thread using `track_thread`, returns thread id
+    pub fn track_current_thread(&mut self, name: &str) -> Pid {
+        let tid = unsafe { syscall(SYS_gettid) } as Pid;
+        self.track_thread(tid, name);
+        return tid;
     }
 }
 
