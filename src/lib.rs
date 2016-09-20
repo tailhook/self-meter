@@ -10,6 +10,7 @@ mod error;
 mod report;
 
 pub use error::Error;
+pub use report::ThreadReportIter;
 pub type Pid = u32;
 
 struct ThreadInfo {
@@ -51,7 +52,7 @@ pub struct ThreadUsage {
 pub struct ThreadIterator;
 
 /// Report returned by `Meter::report`
-#[derive(Debug)]
+#[derive(Debug, RustcEncodable)]
 pub struct Report {
     /// Timestamp
     pub timestamp_ms: u64,
@@ -89,6 +90,17 @@ pub struct Report {
     pub io_read_ops: f32,
     /// Write operations (syscalls) per second (total)
     pub io_write_ops: f32,
+}
+
+/// Report of CPU usage by single thread
+#[derive(Debug, RustcEncodable)]
+pub struct ThreadReport {
+    /// Threads' own CPU usage. 100% is a single core
+    pub cpu_usage: f32,
+    /// Threads' own CPU usage in kernel space. 100% is a single core
+    pub system_cpu: f32,
+    /// Threads' own CPU usage in user space. 100% is a single core
+    pub user_cpu: f32,
 }
 
 /// The main structure that makes mesurements and reports values

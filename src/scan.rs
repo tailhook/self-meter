@@ -63,7 +63,8 @@ impl Meter {
             .map_err(Error::Stat));
         for (&tid, _) in &self.thread_names {
             self.path_buf.truncate(0);
-            write!(&mut self.path_buf, "/proc/self/{}/stat", tid).unwrap();
+            write!(&mut self.path_buf,
+                "/proc/self/task/{}/stat", tid).unwrap();
             try!(read_stat(&mut self.text_buf, &self.path_buf[..],
                     threads.entry(tid).or_insert_with(ThreadInfo::new))
                 .map_err(|e| Error::ThreadStat(tid, e)));

@@ -1,6 +1,15 @@
 use std::time::{Duration, UNIX_EPOCH};
+use std::collections::hash_map::Iter;
 
-use {Meter, Report};
+use {Pid, Meter, Report, Snapshot, ThreadReport};
+
+
+pub struct ThreadReportIter<'a> {
+    threads: Iter<'a,Pid, String>,
+    last: &'a Snapshot,
+    prev: &'a Snapshot,
+    centisecs: f32,
+}
 
 
 fn duration_to_ms(dur: Duration) -> u64 {
@@ -57,5 +66,46 @@ impl Meter {
             io_read_ops: (last.read_ops - prev.read_ops) as f32 / secs,
             io_write_ops: (last.write_ops - prev.write_ops) as f32 / secs,
         })
+    }
+    pub fn thread_report(&self) -> Option<ThreadReportIter> {
+        if self.snapshots.len() < 2 {
+            return None;
+        }
+        let n = self.snapshots.len();
+        let last = &self.snapshots[n-1];
+        let prev = &self.snapshots[n-2];
+        let centisecs = (last.uptime - prev.uptime) as f32;
+        Some(ThreadReportIter {
+            threads: self.thread_names.iter(),
+            last: last,
+            prev: prev,
+            centisecs: centisecs,
+        })
+    }
+}
+
+impl<'a> Iterator for ThreadReportIter<'a> {
+    type Item = (&'a str, ThreadReport);
+    fn next(&mut self) -> Option<(&'a str, ThreadReport)> {
+        while let Some((&pid, name)) = self.threads.next() {
+            let lth = if let Some(thread) = self.last.threads.get(&pid) {
+                thread
+            } else {
+                continue;  // not enough stats for a thread yet
+            };
+            let pth = if let Some(thread) = self.prev.threads.get(&pid) {
+                thread
+            } else {
+                continue;  // not enough stats for a thread yet
+            };
+            let udelta = lth.user_time - pth.user_time;
+            let sdelta = lth.system_time - pth.system_time;
+            return Some((&name[..], ThreadReport {
+                cpu_usage: 100.0 * (udelta + sdelta) as f32 / self.centisecs,
+                system_cpu: 100.0 * sdelta as f32 / self.centisecs,
+                user_cpu: 100.0 * udelta as f32 / self.centisecs,
+            }))
+        }
+        None
     }
 }

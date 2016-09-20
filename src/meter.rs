@@ -3,7 +3,7 @@ use std::fs;
 use std::time::Duration;
 use std::collections::{VecDeque, HashMap};
 
-use {Meter, Error};
+use {Meter, Error, Pid};
 
 
 impl Meter {
@@ -30,6 +30,20 @@ impl Meter {
             memory_swap_peak: 0,
             memory_rss_peak: 0,
         })
+    }
+
+    /// Start tracking specified thread
+    ///
+    /// Note you must add main thread here manually
+    pub fn track_thread(&mut self, tid: Pid, name: &str) {
+        self.thread_names.insert(tid, name.to_string());
+    }
+    /// Stop tracking specified thread (for example if it's dead)
+    pub fn untrack_thread(&mut self, tid: Pid) {
+        self.thread_names.remove(&tid);
+        for s in &mut self.snapshots {
+            s.threads.remove(&tid);
+        }
     }
 }
 

@@ -15,6 +15,9 @@ authors = ["paul@colomiets.name"]
 rustc-serialize = "0.3.19"
 quick-error = "1.1.0"
 
+[dev-dependencies]
+libc = "0.1"
+
 [lib]
 name = "self_meter"
 path = "src/lib.rs"
