@@ -46,6 +46,23 @@ quick_error! {
 
 quick_error! {
     #[derive(Debug)]
+    /// Error reading or parsing /proc/self/io
+    pub enum IoStatError {
+        Io(err: io::Error) {
+            description("IO error")
+            display("{}", err)
+            from()
+        }
+        ParseInt(e: ParseIntError) {
+            description("error parsing int")
+            display("error parsing int: {}", e)
+            from()
+        }
+    }
+}
+
+quick_error! {
+    #[derive(Debug)]
     /// Error reading or parsing /proc/self/status
     pub enum StatusError {
         Io(err: io::Error) {
@@ -94,6 +111,11 @@ quick_error! {
         ThreadStat(tid: Pid, err: StatError) {
             description("Error reading /proc/self/task/<TID>/stat")
             display("Error reading /proc/self/task/{}/stat: {}", tid, err)
+        }
+        IoStat(err: IoStatError) {
+            description("Error reading /proc/self/io")
+            display("Error reading /proc/self/io: {}", err)
+            from()
         }
     }
 }

@@ -75,6 +75,20 @@ pub struct Report {
     pub memory_virtual_peak: u64,
     /// Process' swap usage (not precise)
     pub memory_swap_peak: u64,
+    /// Bytes read per second from block-backed filesystems
+    pub disk_read: f32,
+    /// Bytes written per second from block-backed filesystems
+    pub disk_write: f32,
+    /// Bytes per second of cancelled writes (i.e. removed temporary files)
+    pub disk_cancelled: f32,
+    /// Bytes read per second (total)
+    pub io_read: f32,
+    /// Bytes written per second (total)
+    pub io_write: f32,
+    /// Read operations (syscalls) per second (total)
+    pub io_read_ops: f32,
+    /// Write operations (syscalls) per second (total)
+    pub io_write_ops: f32,
 }
 
 /// The main structure that makes mesurements and reports values
@@ -99,6 +113,7 @@ pub struct Report {
 /// without names, and we can fine-tune performance in the case we have known
 /// number of threads. Obviously, process-wide info accounts all the threads.
 pub struct Meter {
+    #[allow(dead_code)]
     scan_interval: Duration,
     num_cpus: u32,
     num_snapshots: usize,

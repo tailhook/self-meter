@@ -1,6 +1,7 @@
 use std::io::Read;
-use std::fmt::Write;
 use std::fs::File;
+use std::fmt::Write;
+use std::num::ParseIntError;
 use std::time::{Instant, SystemTime};
 use std::collections::HashMap;
 
@@ -27,6 +28,7 @@ impl Meter {
             &mut snap.uptime, &mut snap.idle_time));
 
         try!(self.read_memory(&mut snap));
+        try!(self.read_io(&mut snap));
 
         if snap.memory_rss > self.memory_rss_peak {
             self.memory_rss_peak = snap.memory_rss;
@@ -91,6 +93,39 @@ impl Meter {
         }
         Ok(())
     }
+
+    fn read_io(&mut self, snap: &mut Snapshot)
+        -> Result<(), Error>
+    {
+        let err = &|e: ParseIntError| Error::IoStat(e.into());
+        self.text_buf.truncate(0);
+        try!(File::open("/proc/self/io")
+             .and_then(|mut f| f.read_to_string(&mut self.text_buf)));
+        for line in self.text_buf.lines() {
+            let mut pairs = line.split(':');
+            match (pairs.next(), pairs.next().map(|x| x.trim())) {
+                (Some("rchar"), Some(text))
+                => snap.read_bytes = try!(text.parse().map_err(err)),
+                (Some("wchar"), Some(text))
+                => snap.write_bytes = try!(text.parse().map_err(err)),
+                (Some("syscr"), Some(text))
+                => snap.read_ops = try!(text.parse().map_err(err)),
+                (Some("syscw"), Some(text))
+                => snap.write_ops = try!(text.parse().map_err(err)),
+                (Some("read_bytes"), Some(text))
+                => snap.read_disk_bytes = try!(text.parse().map_err(err)),
+                (Some("write_bytes"), Some(text))
+                => snap.write_disk_bytes = try!(text.parse().map_err(err)),
+                (Some("cancelled_write_bytes"), Some(text)) => {
+                    snap.write_cancelled_bytes =
+                        try!(text.parse().map_err(err));
+                }
+                _ => {}
+            }
+        }
+        Ok(())
+    }
+
 }
 
 fn parse_memory(value: &str) -> Result<u64, StatusError> {

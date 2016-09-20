@@ -19,6 +19,7 @@ impl Meter {
         let lpro = &last.process;
         let ppro = &prev.process;
         let centisecs = (last.uptime - prev.uptime) as f32;
+        let secs = centisecs / 100.0;
         let mut cpu_usage = 100.0 * (1.0 -
                 (last.idle_time - prev.idle_time) as f32 /
                 (centisecs * self.num_cpus as f32));
@@ -45,6 +46,16 @@ impl Meter {
             memory_rss_peak: self.memory_rss_peak,
             memory_virtual_peak: last.memory_virtual_peak,
             memory_swap_peak: self.memory_swap_peak,
+            disk_read: (last.read_disk_bytes - prev.read_disk_bytes) as f32
+                / secs,
+            disk_write: (last.write_disk_bytes - prev.write_disk_bytes) as f32
+                / secs,
+            disk_cancelled: (last.write_cancelled_bytes -
+                             prev.write_cancelled_bytes) as f32 / secs,
+            io_read: (last.read_bytes - prev.read_bytes) as f32 / secs,
+            io_write: (last.write_bytes - prev.write_bytes) as f32 / secs,
+            io_read_ops: (last.read_ops - prev.read_ops) as f32 / secs,
+            io_write_ops: (last.write_ops - prev.write_ops) as f32 / secs,
         })
     }
 }
