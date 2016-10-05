@@ -2,7 +2,7 @@ Self-Meter
 ==========
 
 :Status: beta
-:Documentation: http://tailhook.github.io/self-meter/
+:Documentation: https://docs.rs/self-meter/
 
 A tiny library to measure resource usage of the process it's used in.
 Currently it measures:
