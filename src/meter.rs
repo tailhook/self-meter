@@ -1,8 +1,7 @@
-use std::io;
-use std::fs;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use std::collections::{VecDeque, HashMap};
 
+use num_cpus;
 use libc::{syscall, SYS_gettid};
 
 use {Meter, Error, Pid};
@@ -22,8 +21,9 @@ impl Meter {
     pub fn new(scan_interval: Duration) -> Result<Meter, Error> {
         Ok(Meter {
             scan_interval: scan_interval,
-            num_cpus: try!(num_cpus().map_err(Error::Cpu)),
+            num_cpus: num_cpus::get(),
             num_snapshots: 10,
+            start_time: SystemTime::now(),
             snapshots: VecDeque::with_capacity(10),
             thread_names: HashMap::new(),
             text_buf: String::with_capacity(1024),
@@ -53,21 +53,4 @@ impl Meter {
         self.track_thread(tid, name);
         return tid;
     }
-}
-
-
-fn is_cpu(name: &str) -> bool {
-    name.starts_with("cpu") && name[3..].parse::<u32>().is_ok()
-}
-
-
-fn num_cpus() -> io::Result<u32> {
-    let mut cnt = 0;
-    for entry in try!(fs::read_dir("/sys/devices/system/cpu")) {
-        let entry = try!(entry);
-        if entry.file_name().to_str().map(is_cpu).unwrap_or(false) {
-            cnt += 1;
-        }
-    }
-    Ok(cnt)
 }

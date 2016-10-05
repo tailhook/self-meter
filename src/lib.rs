@@ -1,6 +1,7 @@
 #[macro_use] extern crate quick_error;
 extern crate rustc_serialize;
 extern crate libc;
+extern crate num_cpus;
 
 use std::time::{SystemTime, Instant, Duration};
 use std::collections::{VecDeque, HashMap};
@@ -24,7 +25,9 @@ struct ThreadInfo {
 struct Snapshot {
     timestamp: SystemTime,
     instant: Instant,
+    /// System uptime in centisecs
     uptime: u64,
+    /// System idle time in centisecs
     idle_time: u64,
     process: ThreadInfo,
     memory_rss: u64,
@@ -59,6 +62,13 @@ pub struct Report {
     pub timestamp_ms: u64,
     /// The interval time this data has averaged over in milliseconds
     pub duration_ms: u64,
+    /// Uptime of a process (a number of seconds since self-meter has started)
+    pub uptime: u64,
+    /// The uptime of the system
+    ///
+    /// Note this value can be smaller than `uptime` because this value doesn't
+    /// include time when system was sleeping
+    pub system_uptime: u64,
     /// Whole system CPU usage. 100% is all cores
     pub global_cpu_usage: f32,
     /// Process' own CPU usage. 100% is a single core
@@ -128,8 +138,9 @@ pub struct ThreadReport {
 pub struct Meter {
     #[allow(dead_code)]
     scan_interval: Duration,
-    num_cpus: u32,
+    num_cpus: usize,
     num_snapshots: usize,
+    start_time: SystemTime,
     snapshots: VecDeque<Snapshot>,
     thread_names: HashMap<Pid, String>,
     /// This is a buffer for reading some text data from /proc/anything.

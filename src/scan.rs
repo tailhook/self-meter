@@ -139,7 +139,7 @@ fn parse_memory(value: &str) -> Result<u64, StatusError> {
     }
 }
 
-fn parse_uptime(value: &str) -> Result<u64, UptimeError> {
+pub fn parse_uptime(value: &str) -> Result<u64, UptimeError> {
     if value.len() <= 3 {
         return Err(UptimeError::BadFormat);
     }
@@ -170,7 +170,6 @@ fn read_stat(text_buf: &mut String, path: &str, thread_info: &mut ThreadInfo)
         try!(iter.next().ok_or(StatError::BadFormat)).parse());
     Ok(())
 }
-
 
 impl ThreadInfo {
     fn new() -> ThreadInfo {
