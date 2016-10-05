@@ -62,13 +62,13 @@ pub struct Report {
     pub timestamp_ms: u64,
     /// The interval time this data has averaged over in milliseconds
     pub duration_ms: u64,
-    /// Uptime of a process (a number of seconds since self-meter has started)
-    pub uptime: u64,
+    /// Start time
+    pub start_time_ms: u64,
     /// The uptime of the system
     ///
-    /// Note this value can be smaller than `uptime` because this value doesn't
-    /// include time when system was sleeping
-    pub system_uptime: u64,
+    /// Note this value can be smaller than time since `start_time_ms`
+    /// because this value doesn't include time when system was sleeping
+    pub system_uptime_ms: u64,
     /// Whole system CPU usage. 100% is all cores
     pub global_cpu_usage: f32,
     /// Process' own CPU usage. 100% is a single core

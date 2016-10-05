@@ -39,9 +39,9 @@ impl Meter {
             timestamp_ms: duration_to_ms(
                 last.timestamp.duration_since(UNIX_EPOCH).unwrap()),
             duration_ms: duration_to_ms(last.instant - prev.instant),
-            uptime: duration_to_ms(
+            start_time_ms: duration_to_ms(
                 self.start_time.duration_since(UNIX_EPOCH).unwrap()),
-            system_uptime: last.uptime * 10,  // uptime is centisecs
+            system_uptime_ms: last.uptime * 10,  // uptime is centisecs
             global_cpu_usage: cpu_usage,
             process_cpu_usage: 100.0 *
                 (lpro.user_time + lpro.system_time -
