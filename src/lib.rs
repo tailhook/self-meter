@@ -1,7 +1,9 @@
-#[macro_use] extern crate quick_error;
-extern crate rustc_serialize;
 extern crate libc;
 extern crate num_cpus;
+extern crate serde_json;
+
+#[macro_use] extern crate quick_error;
+#[macro_use] extern crate serde_derive;
 
 use std::time::{SystemTime, Instant, Duration};
 use std::collections::{VecDeque, HashMap};
@@ -56,7 +58,7 @@ pub struct ThreadUsage {
 pub struct ThreadIterator;
 
 /// Report returned by `Meter::report`
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug, Serialize)]
 pub struct Report {
     /// Timestamp
     pub timestamp_ms: u64,
@@ -104,7 +106,7 @@ pub struct Report {
 }
 
 /// Report of CPU usage by single thread
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug, Serialize)]
 pub struct ThreadReport {
     /// Threads' own CPU usage. 100% is a single core
     pub cpu_usage: f32,
