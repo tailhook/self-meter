@@ -38,7 +38,6 @@
 extern crate libc;
 extern crate num_cpus;
 extern crate serde;
-extern crate serde_json;
 
 #[macro_use] extern crate quick_error;
 #[macro_use] extern crate serde_derive;
@@ -99,7 +98,7 @@ pub struct ThreadUsage {
 
 /// Report returned by `Meter::report`
 ///
-/// Note: this structure implements serde_json, and all timestamps and
+/// Note: this structure implements `serde::Serialize`, and all timestamps and
 /// durations are stored as integers in milliseconds.
 #[derive(Debug, Serialize)]
 pub struct Report {

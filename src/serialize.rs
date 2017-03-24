@@ -6,11 +6,11 @@ use serde::Serializer;
 fn tstamp_to_ms(tm: SystemTime) -> u64 {
     let ts = tm.duration_since(UNIX_EPOCH)
         .expect("timestamp is always after unix epoch");
-    return ts.as_secs() + (ts.subsec_nanos() / 1000000) as u64;
+    return ts.as_secs()*1000 + (ts.subsec_nanos() / 1000000) as u64;
 }
 
 fn duration_to_ms(dur: Duration) -> u64 {
-    return dur.as_secs() + (dur.subsec_nanos() / 1000000) as u64;
+    return dur.as_secs()*1000 + (dur.subsec_nanos() / 1000000) as u64;
 }
 
 pub fn serialize_timestamp<S>(tm: &SystemTime, ser: S)

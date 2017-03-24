@@ -14,10 +14,12 @@ authors = ["paul@colomiets.name"]
 [dependencies]
 serde = "0.9.11"
 serde_derive = "0.9.11"
-serde_json = "0.9.9"
 quick-error = "1.1.0"
 libc = "0.2.16"
 num_cpus = "1.1.0"
+
+[dev-dependencies]
+serde_json = "0.9.9"
 
 [lib]
 name = "self_meter"
