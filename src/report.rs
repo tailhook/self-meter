@@ -120,4 +120,10 @@ impl<'a> Iterator for ThreadReportIter<'a> {
         }
         None
     }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let (_min, max) = self.threads.size_hint();
+        // unfortunately we skip non-scanned threads, so we must assume that
+        // minimum size is zero
+        return (0, max);
+    }
 }
