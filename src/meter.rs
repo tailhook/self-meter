@@ -53,6 +53,11 @@ impl Meter {
         self.track_thread(tid, name);
         return tid;
     }
+    /// Remove current thread using `untrack_thread`
+    pub fn untrack_current_thread(&mut self) {
+        let tid = unsafe { syscall(SYS_gettid) } as Pid;
+        self.untrack_thread(tid);
+    }
     /// Returns interval value configured in constructor
     pub fn get_scan_interval(&self) -> Duration {
         self.scan_interval
