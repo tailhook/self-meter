@@ -8,7 +8,7 @@ readme = "README.rst"
 keywords = ["linux", "monitoring", "meter"]
 homepage = "https://github.com/tailhook/self-meter"
 documentation = "https://docs.rs/self-meter"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["paul@colomiets.name"]
 
 [dependencies]
