@@ -4,6 +4,7 @@ use std::collections::hash_map::Iter;
 use {Pid, Meter, Report, Snapshot, ThreadReport};
 
 
+/// Iterator over thread reports returned by ``Meter::thread_report``
 pub struct ThreadReportIter<'a> {
     threads: Iter<'a,Pid, String>,
     last: &'a Snapshot,
@@ -17,6 +18,10 @@ fn duration_from_ms(ms: u64) -> Duration {
 
 
 impl Meter {
+    /// Get report of the last scan interval
+    ///
+    /// We need at least two scans to measure CPU usage, so this method
+    /// returns None if less than two scans were done ever in the past.
     pub fn report(&self) -> Option<Report> {
         if self.snapshots.len() < 2 {
             return None;
@@ -67,6 +72,13 @@ impl Meter {
             io_write_ops: (last.write_ops - prev.write_ops) as f32 / secs,
         })
     }
+    /// Returns iterator over reports for threads
+    ///
+    /// Note: each thread must be registered with `Meter::track_thread` or
+    /// `Meter::track_current_thread` to be tracked here.
+    ///
+    /// We need at least two scans to measure CPU usage, so this method
+    /// returns None if less than two scans were done ever in the past.
     pub fn thread_report(&self) -> Option<ThreadReportIter> {
         if self.snapshots.len() < 2 {
             return None;

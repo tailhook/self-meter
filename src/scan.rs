@@ -10,6 +10,10 @@ use error::{UptimeError, StatError, StatusError};
 
 
 impl Meter {
+    /// Scan system for metrics
+    ///
+    /// This method must be called regularly at intervals specified
+    /// in constructor.
     pub fn scan(&mut self) -> Result<(), Error> {
         // We reuse Snapshot structure (mostly becasuse of threads hash map)
         // to have smaller allocations on the fast path

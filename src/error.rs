@@ -89,29 +89,35 @@ quick_error! {
     #[derive(Debug)]
     /// Error scanning process info in /proc
     pub enum Error {
+        /// Error reading CPU number
         Cpu(err: io::Error) {
             description("Error reading /sys/devices/system/cpu")
             display("Error reading /sys/devices/system/cpu: {}", err)
             from()
         }
+        /// Error reading uptime value
         Uptime(err: UptimeError) {
             description("Error reading /proc/uptime")
             display("Error reading /proc/uptime: {}", err)
             from()
         }
+        /// Error reading /proc/self/status
         Status(err: StatusError) {
             description("Error reading /proc/self/status")
             display("Error reading /proc/self/status: {}", err)
             from()
         }
+        /// Error reading /proc/self/stat
         Stat(err: StatError) {
             description("Error reading /proc/self/stat")
             display("Error reading /proc/self/stat: {}", err)
         }
+        /// Error reading thread status
         ThreadStat(tid: Pid, err: StatError) {
             description("Error reading /proc/self/task/<TID>/stat")
             display("Error reading /proc/self/task/{}/stat: {}", tid, err)
         }
+        /// Error reading IO stats
         IoStat(err: IoStatError) {
             description("Error reading /proc/self/io")
             display("Error reading /proc/self/io: {}", err)

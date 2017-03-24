@@ -1,3 +1,39 @@
+#![warn(missing_docs)]
+//! A tiny library to measure resource usage of the process it's used in.
+//! Currently it measures:
+//!
+//! * Memory Usage
+//! * CPU Usage with breakdown by each thread
+//! * Disk Usage
+//!
+//! More metrics might be added later. Currently, library supports only linux,
+//! but pull requests for other platforms are welcome.
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//!
+//! # use std::io::{Write, stderr};
+//! # use std::time::Duration;
+//! # use std::thread::sleep;
+//! # use std::collections::BTreeMap;
+//!
+//! fn main() {
+//!    let mut meter = self_meter::Meter::new(Duration::new(1, 0)).unwrap();
+//!    meter.track_current_thread("main");
+//!    loop {
+//!        meter.scan()
+//!            .map_err(|e| writeln!(&mut stderr(), "Scan error: {}", e)).ok();
+//!        println!("Report: {:#?}", meter.report());
+//!        println!("Threads: {:#?}",
+//!            meter.thread_report().map(|x| x.collect::<BTreeMap<_,_>>()));
+//!        // Put your task here
+//!        // ...
+//!        //
+//!        sleep(Duration::new(1, 0));
+//!    }
+//! }
+//! ```
 extern crate libc;
 extern crate num_cpus;
 extern crate serde;
@@ -17,6 +53,7 @@ mod serialize;
 
 pub use error::Error;
 pub use report::ThreadReportIter;
+/// A Pid type used to identify processes and threads
 pub type Pid = u32;
 
 struct ThreadInfo {
@@ -56,8 +93,6 @@ pub struct ThreadUsage {
     /// Thread's CPU usage with its awaited children. 100% is a single core
     pub cpu_usage_with_children: f32,
 }
-
-pub struct ThreadIterator;
 
 /// Report returned by `Meter::report`
 ///
