@@ -1,4 +1,5 @@
 #![warn(missing_docs)]
+#![warn(missing_debug_implementations)]
 //! A tiny library to measure resource usage of the process it's used in.
 //! Currently it measures:
 //!
@@ -50,6 +51,7 @@ mod scan;
 mod error;
 mod report;
 mod serialize;
+mod debug;
 
 pub use error::Error;
 pub use report::ThreadReportIter;
@@ -87,6 +89,7 @@ struct Snapshot {
 
 
 /// CPU usage of a single thread
+#[derive(Debug)]
 pub struct ThreadUsage {
     /// Thread's own CPU usage. 100% is a single core
     pub cpu_usage: f32,
