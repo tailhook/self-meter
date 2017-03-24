@@ -1,4 +1,4 @@
-use std::time::{Duration, UNIX_EPOCH};
+use std::time::{Duration};
 use std::collections::hash_map::Iter;
 
 use {Pid, Meter, Report, Snapshot, ThreadReport};
@@ -11,9 +11,8 @@ pub struct ThreadReportIter<'a> {
     centisecs: f32,
 }
 
-
-fn duration_to_ms(dur: Duration) -> u64 {
-    return dur.as_secs() * 1000 + (dur.subsec_nanos() / 1000000) as u64;
+fn duration_from_ms(ms: u64) -> Duration {
+    Duration::new(ms / 1000, ((ms % 1000) * 1000_000) as u32)
 }
 
 
@@ -36,12 +35,10 @@ impl Meter {
             cpu_usage = 0.;
         }
         Some(Report {
-            timestamp_ms: duration_to_ms(
-                last.timestamp.duration_since(UNIX_EPOCH).unwrap()),
-            duration_ms: duration_to_ms(last.instant - prev.instant),
-            start_time_ms: duration_to_ms(
-                self.start_time.duration_since(UNIX_EPOCH).unwrap()),
-            system_uptime_ms: last.uptime * 10,  // uptime is centisecs
+            timestamp: last.timestamp,
+            duration: last.instant - prev.instant,
+            start_time: self.start_time,
+            system_uptime: duration_from_ms(last.uptime * 10),  // centisecs
             global_cpu_usage: cpu_usage,
             process_cpu_usage: 100.0 *
                 (lpro.user_time + lpro.system_time -

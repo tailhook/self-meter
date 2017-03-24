@@ -1,5 +1,6 @@
 extern crate libc;
 extern crate num_cpus;
+extern crate serde;
 extern crate serde_json;
 
 #[macro_use] extern crate quick_error;
@@ -12,6 +13,7 @@ mod meter;
 mod scan;
 mod error;
 mod report;
+mod serialize;
 
 pub use error::Error;
 pub use report::ThreadReportIter;
@@ -58,19 +60,29 @@ pub struct ThreadUsage {
 pub struct ThreadIterator;
 
 /// Report returned by `Meter::report`
+///
+/// Note: this structure implements serde_json, and all timestamps and
+/// durations are stored as integers in milliseconds.
 #[derive(Debug, Serialize)]
 pub struct Report {
     /// Timestamp
-    pub timestamp_ms: u64,
+    #[serde(serialize_with="serialize::serialize_timestamp")]
+    pub timestamp: SystemTime,
+
     /// The interval time this data has averaged over in milliseconds
-    pub duration_ms: u64,
+    #[serde(serialize_with="serialize::serialize_duration")]
+    pub duration: Duration,
+
     /// Start time
-    pub start_time_ms: u64,
+    #[serde(serialize_with="serialize::serialize_timestamp")]
+    pub start_time: SystemTime,
+
     /// The uptime of the system
     ///
-    /// Note this value can be smaller than time since `start_time_ms`
+    /// Note this value can be smaller than time since `start_time`
     /// because this value doesn't include time when system was sleeping
-    pub system_uptime_ms: u64,
+    #[serde(serialize_with="serialize::serialize_duration")]
+    pub system_uptime: Duration,
     /// Whole system CPU usage. 100% is all cores
     pub global_cpu_usage: f32,
     /// Process' own CPU usage. 100% is a single core
