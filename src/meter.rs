@@ -53,4 +53,8 @@ impl Meter {
         self.track_thread(tid, name);
         return tid;
     }
+    /// Returns interval value configured in constructor
+    pub fn get_scan_interval(&self) -> Duration {
+        self.scan_interval
+    }
 }
