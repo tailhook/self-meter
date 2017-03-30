@@ -2,7 +2,6 @@ use std::time::{Duration, SystemTime};
 use std::collections::{VecDeque, HashMap};
 
 use num_cpus;
-use libc::{syscall, SYS_gettid};
 
 use {Meter, Error, Pid};
 
@@ -48,15 +47,34 @@ impl Meter {
         }
     }
     /// Add current thread using `track_thread`, returns thread id
+    #[cfg(target_os="linux")]
     pub fn track_current_thread(&mut self, name: &str) -> Pid {
+        use libc::{syscall, SYS_gettid};
         let tid = unsafe { syscall(SYS_gettid) } as Pid;
         self.track_thread(tid, name);
         return tid;
     }
+    /// Add current thread using `track_thread`, returns thread id
+    ///
+    /// Non-linux is not supported yet (no-op)
+    #[cfg(not(target_os="linux"))]
+    pub fn track_current_thread(&mut self, _name: &str) -> Pid {
+        // TODO(tailhook) OS X and windows
+        0
+    }
     /// Remove current thread using `untrack_thread`
+    #[cfg(target_os="linux")]
     pub fn untrack_current_thread(&mut self) {
+        use libc::{syscall, SYS_gettid};
         let tid = unsafe { syscall(SYS_gettid) } as Pid;
         self.untrack_thread(tid);
+    }
+    /// Remove current thread using `untrack_thread`
+    ///
+    /// Non-linux is not supported yet (no-op)
+    #[cfg(not(target_os="linux"))]
+    pub fn untrack_current_thread(&mut self) {
+        // TODO
     }
     /// Returns interval value configured in constructor
     pub fn get_scan_interval(&self) -> Duration {
