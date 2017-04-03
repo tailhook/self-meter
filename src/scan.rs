@@ -147,12 +147,17 @@ pub fn parse_uptime(value: &str) -> Result<u64, UptimeError> {
     if value.len() <= 3 {
         return Err(UptimeError::BadFormat);
     }
-    let dot = value.len()-3;
-    if !value.is_char_boundary(dot) || &value[dot..dot+1] != "." {
-        return Err(UptimeError::BadFormat);
+    let dot = value.find('.').ok_or(UptimeError::BadFormat)?;
+    let (integer, decimals) = value.split_at(dot);
+    if decimals.len() == 1+1 {
+        Ok(try!(integer.parse::<u64>()) * 100 +
+           try!(decimals[1..].parse::<u64>())*10)
+    } else if decimals.len() == 1+2 {
+        Ok(try!(integer.parse::<u64>()) * 100 +
+           try!(decimals[1..].parse::<u64>()))
+    } else {
+        Err(UptimeError::BadFormat)
     }
-    Ok(try!(value[..dot].parse::<u64>()) * 100 +
-       try!(value[dot+1..].parse::<u64>()))
 }
 
 fn read_stat(text_buf: &mut String, path: &str, thread_info: &mut ThreadInfo)
@@ -209,5 +214,19 @@ impl Snapshot {
                 .map(|(&pid, _)| (pid, ThreadInfo::new()))
                 .collect(),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::parse_uptime;
+
+    #[test]
+    fn normal_uptime() {
+        assert_eq!(parse_uptime("1927830.69").unwrap(), 192783069);
+    }
+    #[test]
+    fn one_zero_uptime() {
+        assert_eq!(parse_uptime("4780.0").unwrap(), 478000);
     }
 }
