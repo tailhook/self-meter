@@ -1,9 +1,11 @@
+use std::fs::File;
 use std::time::{Duration, SystemTime};
 use std::collections::{VecDeque, HashMap};
 
 use num_cpus;
 
 use {Meter, Error, Pid};
+use error::IoStatError;
 
 
 impl Meter {
@@ -18,6 +20,7 @@ impl Meter {
     /// When creating a `Meter` object we are trying to discover the number
     /// of processes on the system. If that fails, we return error.
     pub fn new(scan_interval: Duration) -> Result<Meter, Error> {
+        let io_file = File::open("/proc/self/io").map_err(IoStatError::Io)?;
         Ok(Meter {
             scan_interval: scan_interval,
             num_cpus: num_cpus::get(),
@@ -27,6 +30,7 @@ impl Meter {
             thread_names: HashMap::new(),
             text_buf: String::with_capacity(1024),
             path_buf: String::with_capacity(100),
+            io_file: io_file,
 
             memory_swap_peak: 0,
             memory_rss_peak: 0,

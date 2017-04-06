@@ -42,6 +42,7 @@ extern crate serde;
 #[macro_use] extern crate quick_error;
 #[macro_use] extern crate serde_derive;
 
+use std::fs::File;
 use std::time::{SystemTime, Instant, Duration};
 use std::collections::{VecDeque, HashMap};
 
@@ -200,6 +201,10 @@ pub struct Meter {
     text_buf: String,
     /// This is a smaller buffer for formatting paths, similar to `text_buf`
     path_buf: String,
+
+    /// This file is always open because if we drop privileges and then
+    /// try to open a file we can't open it back again
+    io_file: File,
 
     memory_rss_peak: u64,
     memory_swap_peak: u64,

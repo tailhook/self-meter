@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::io::{Read, Seek, SeekFrom};
 use std::fs::File;
 use std::fmt::Write;
 use std::num::ParseIntError;
@@ -104,27 +104,27 @@ impl Meter {
     {
         let err = &|e: ParseIntError| Error::IoStat(e.into());
         self.text_buf.truncate(0);
-        try!(File::open("/proc/self/io")
-             .and_then(|mut f| f.read_to_string(&mut self.text_buf))
-             .map_err(IoStatError::Io));
+        self.io_file.seek(SeekFrom::Start(0))
+            .map_err(IoStatError::Io)?;
+        self.io_file.read_to_string(&mut self.text_buf)
+            .map_err(IoStatError::Io)?;
         for line in self.text_buf.lines() {
             let mut pairs = line.split(':');
             match (pairs.next(), pairs.next().map(|x| x.trim())) {
                 (Some("rchar"), Some(text))
-                => snap.read_bytes = try!(text.parse().map_err(err)),
+                => snap.read_bytes = text.parse().map_err(err)?,
                 (Some("wchar"), Some(text))
-                => snap.write_bytes = try!(text.parse().map_err(err)),
+                => snap.write_bytes = text.parse().map_err(err)?,
                 (Some("syscr"), Some(text))
-                => snap.read_ops = try!(text.parse().map_err(err)),
+                => snap.read_ops = text.parse().map_err(err)?,
                 (Some("syscw"), Some(text))
-                => snap.write_ops = try!(text.parse().map_err(err)),
+                => snap.write_ops = text.parse().map_err(err)?,
                 (Some("read_bytes"), Some(text))
-                => snap.read_disk_bytes = try!(text.parse().map_err(err)),
+                => snap.read_disk_bytes = text.parse().map_err(err)?,
                 (Some("write_bytes"), Some(text))
-                => snap.write_disk_bytes = try!(text.parse().map_err(err)),
+                => snap.write_disk_bytes = text.parse().map_err(err)?,
                 (Some("cancelled_write_bytes"), Some(text)) => {
-                    snap.write_cancelled_bytes =
-                        try!(text.parse().map_err(err));
+                    snap.write_cancelled_bytes = text.parse().map_err(err)?;
                 }
                 _ => {}
             }
