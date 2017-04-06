@@ -89,11 +89,6 @@ quick_error! {
     #[derive(Debug)]
     /// Error scanning process info in /proc
     pub enum Error {
-        /// Error reading CPU number
-        Cpu(err: io::Error) {
-            description("Error reading /sys/devices/system/cpu")
-            display("Error reading /sys/devices/system/cpu: {}", err)
-        }
         /// Error reading uptime value
         Uptime(err: UptimeError) {
             description("Error reading /proc/uptime")
