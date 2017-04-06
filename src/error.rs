@@ -93,7 +93,6 @@ quick_error! {
         Cpu(err: io::Error) {
             description("Error reading /sys/devices/system/cpu")
             display("Error reading /sys/devices/system/cpu: {}", err)
-            from()
         }
         /// Error reading uptime value
         Uptime(err: UptimeError) {

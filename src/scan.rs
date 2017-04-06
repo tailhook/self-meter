@@ -6,7 +6,7 @@ use std::time::{Instant, SystemTime};
 use std::collections::HashMap;
 
 use {Meter, Snapshot, ThreadInfo, Pid, Error};
-use error::{UptimeError, StatError, StatusError};
+use error::{UptimeError, StatError, StatusError, IoStatError};
 
 
 impl Meter {
@@ -105,7 +105,8 @@ impl Meter {
         let err = &|e: ParseIntError| Error::IoStat(e.into());
         self.text_buf.truncate(0);
         try!(File::open("/proc/self/io")
-             .and_then(|mut f| f.read_to_string(&mut self.text_buf)));
+             .and_then(|mut f| f.read_to_string(&mut self.text_buf))
+             .map_err(IoStatError::Io));
         for line in self.text_buf.lines() {
             let mut pairs = line.split(':');
             match (pairs.next(), pairs.next().map(|x| x.trim())) {
