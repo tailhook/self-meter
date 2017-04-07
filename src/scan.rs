@@ -45,7 +45,7 @@ impl Meter {
         Ok(())
     }
 
-    #[cfg(linux)]
+    #[cfg(target_os="linux")]
     fn read_cpu_times(&mut self, process: &mut ThreadInfo,
                       threads: &mut HashMap<Pid, ThreadInfo>,
                       uptime: &mut u64, idle_time: &mut u64)
@@ -77,7 +77,7 @@ impl Meter {
         Ok(())
     }
 
-    #[cfg(not(linux))]
+    #[cfg(not(target_os="linux"))]
     fn read_cpu_times(&mut self, process: &mut ThreadInfo,
                       threads: &mut HashMap<Pid, ThreadInfo>,
                       uptime: &mut u64, idle_time: &mut u64)
@@ -86,7 +86,7 @@ impl Meter {
         Ok(())
     }
 
-    #[cfg(linux)]
+    #[cfg(target_os="linux")]
     fn read_memory(&mut self, snap: &mut Snapshot)
         -> Result<(), StatusError>
     {
@@ -110,14 +110,14 @@ impl Meter {
         Ok(())
     }
 
-    #[cfg(not(linux))]
+    #[cfg(not(target_os="linux"))]
     fn read_memory(&mut self, snap: &mut Snapshot)
         -> Result<(), StatusError>
     {
         Ok(())
     }
 
-    #[cfg(linux)]
+    #[cfg(target_os="linux")]
     fn read_io(&mut self, snap: &mut Snapshot)
         -> Result<(), Error>
     {
@@ -150,7 +150,7 @@ impl Meter {
         }
         Ok(())
     }
-    #[cfg(not(linux))]
+    #[cfg(not(target_os="linux"))]
     fn read_io(&mut self, snap: &mut Snapshot)
         -> Result<(), Error>
     {

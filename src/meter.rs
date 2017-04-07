@@ -22,7 +22,7 @@ impl Meter {
     pub fn new(scan_interval: Duration) -> Result<Meter, Error> {
         Meter::_new(scan_interval)
     }
-    #[cfg(linux)]
+    #[cfg(target_os="linux")]
     fn _new(scan_interval: Duration) -> Result<Meter, Error> {
         let io_file = File::open("/proc/self/io").map_err(IoStatError::Io)?;
         Ok(Meter {
@@ -41,7 +41,7 @@ impl Meter {
         })
     }
 
-    #[cfg(not(linux))]
+    #[cfg(not(target_os="linux"))]
     fn _new(scan_interval: Duration) -> Result<Meter, Error> {
         Ok(Meter {
             scan_interval: scan_interval,
