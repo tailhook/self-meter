@@ -204,6 +204,7 @@ pub struct Meter {
 
     /// This file is always open because if we drop privileges and then
     /// try to open a file we can't open it back again
+    #[cfg(linux)]
     io_file: File,
 
     memory_rss_peak: u64,

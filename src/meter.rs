@@ -20,6 +20,10 @@ impl Meter {
     /// When creating a `Meter` object we are trying to discover the number
     /// of processes on the system. If that fails, we return error.
     pub fn new(scan_interval: Duration) -> Result<Meter, Error> {
+        Meter::_new(scan_interval)
+    }
+    #[cfg(linux)]
+    fn _new(scan_interval: Duration) -> Result<Meter, Error> {
         let io_file = File::open("/proc/self/io").map_err(IoStatError::Io)?;
         Ok(Meter {
             scan_interval: scan_interval,
@@ -31,6 +35,23 @@ impl Meter {
             text_buf: String::with_capacity(1024),
             path_buf: String::with_capacity(100),
             io_file: io_file,
+
+            memory_swap_peak: 0,
+            memory_rss_peak: 0,
+        })
+    }
+
+    #[cfg(not(linux))]
+    fn _new(scan_interval: Duration) -> Result<Meter, Error> {
+        Ok(Meter {
+            scan_interval: scan_interval,
+            num_cpus: num_cpus::get(),
+            num_snapshots: 10,
+            start_time: SystemTime::now(),
+            snapshots: VecDeque::with_capacity(10),
+            thread_names: HashMap::new(),
+            text_buf: String::with_capacity(1024),
+            path_buf: String::with_capacity(100),
 
             memory_swap_peak: 0,
             memory_rss_peak: 0,
