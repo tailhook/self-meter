@@ -8,18 +8,18 @@ readme = "README.rst"
 keywords = ["linux", "monitoring", "meter"]
 homepage = "https://github.com/tailhook/self-meter"
 documentation = "https://docs.rs/self-meter"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["paul@colomiets.name"]
 
 [dependencies]
-serde = "0.9.11"
-serde_derive = "0.9.11"
+serde = "1.0.0"
+serde_derive = "1.0.0"
 quick-error = "1.1.0"
 libc = "0.2.16"
 num_cpus = "1.1.0"
 
 [dev-dependencies]
-serde_json = "0.9.9"
+serde_json = "1.0.0"
 
 [lib]
 name = "self_meter"
